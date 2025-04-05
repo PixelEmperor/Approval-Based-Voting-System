@@ -1,0 +1,251 @@
+{% extends "base.html" %}
+
+{% block extra_css %}
+<style>
+    .stats-summary {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 3rem;
+    }
+    
+    .stat-card {
+        background: linear-gradient(145deg, #ffffff, #f8f9fa);
+        padding: 1.5rem;
+        border-radius: 12px;
+        text-align: center;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        transition: transform 0.3s ease;
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-5px);
+    }
+    
+    .stat-card h4 {
+        color: #6c757d;
+        margin-bottom: 1rem;
+        font-size: 1rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+    
+    .stat-card p {
+        font-size: 2rem;
+        font-weight: 600;
+        margin: 0;
+        color: #2c3e50;
+    }
+    
+    .results-table {
+        margin-top: 2rem;
+        background: #ffffff;
+        border-radius: 12px;
+        padding: 1.5rem;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    
+    .table {
+        margin: 0;
+    }
+    
+    .table thead th {
+        background-color: #f8f9fa;
+        border-bottom: 2px solid #dee2e6;
+        color: #2c3e50;
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.9rem;
+        letter-spacing: 1px;
+    }
+    
+    .progress {
+        height: 12px;
+        background-color: #e9ecef;
+        border-radius: 6px;
+        overflow: hidden;
+    }
+    
+    .progress-bar {
+        background: linear-gradient(45deg, #3498db, #2980b9);
+        border-radius: 6px;
+        transition: width 1s ease-in-out;
+    }
+    
+    .rank-1 {
+        background-color: #ffd700;
+        color: #000;
+        padding: 0.2rem 0.5rem;
+        border-radius: 4px;
+    }
+    
+    .rank-2 {
+        background-color: #c0c0c0;
+        color: #000;
+        padding: 0.2rem 0.5rem;
+        border-radius: 4px;
+    }
+    
+    .rank-3 {
+        background-color: #cd7f32;
+        color: #fff;
+        padding: 0.2rem 0.5rem;
+        border-radius: 4px;
+    }
+
+    .reset-section {
+        margin-top: 2rem;
+        text-align: right;
+    }
+
+    .btn-reset {
+        background-color: #e74c3c;
+        color: white;
+        padding: 0.8rem 2rem;
+        border: none;
+        border-radius: 8px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+
+    .btn-reset:hover {
+        background-color: #c0392b;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+
+    .modal-content {
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    }
+
+    .modal-header {
+        background-color: #e74c3c;
+        color: white;
+        border-radius: 12px 12px 0 0;
+    }
+
+    .modal-body {
+        padding: 2rem;
+    }
+
+    .modal-footer {
+        border-top: none;
+        padding: 1rem 2rem;
+    }
+
+    .btn-confirm-reset {
+        background-color: #e74c3c;
+        color: white;
+        border: none;
+    }
+
+    .btn-confirm-reset:hover {
+        background-color: #c0392b;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2><i class="fas fa-chart-bar me-2"></i>Election Results</h2>
+    
+    <div class="stats-summary">
+        <div class="stat-card">
+            <h4><i class="fas fa-users me-2"></i>Total Votes Cast</h4>
+            <p>{{ stats.total_votes }}</p>
+        </div>
+        <div class="stat-card">
+            <h4><i class="fas fa-user-tie me-2"></i>Total Candidates</h4>
+            <p>{{ stats.total_candidates }}</p>
+        </div>
+        <div class="stat-card">
+            <h4><i class="fas fa-trophy me-2"></i>Highest Votes</h4>
+            <p>{{ stats.highest_votes }}</p>
+        </div>
+        <div class="stat-card">
+            <h4><i class="fas fa-chart-line me-2"></i>Lowest Votes</h4>
+            <p>{{ stats.lowest_votes }}</p>
+        </div>
+    </div>
+
+    <div class="results-table">
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>Rank</th>
+                    <th>Candidate</th>
+                    <th>Symbol</th>
+                    <th>Votes</th>
+                    <th>Percentage</th>
+                    <th>Distribution</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for result in results %}
+                <tr>
+                    <td>
+                        {% if loop.index == 1 %}
+                            <span class="rank-1">1st</span>
+                        {% elif loop.index == 2 %}
+                            <span class="rank-2">2nd</span>
+                        {% elif loop.index == 3 %}
+                            <span class="rank-3">3rd</span>
+                        {% else %}
+                            {{ loop.index }}th
+                        {% endif %}
+                    </td>
+                    <td>{{ result.name }}</td>
+                    <td>{{ result.symbol }}</td>
+                    <td>{{ result.votes }}</td>
+                    <td>{{ result.percentage }}%</td>
+                    <td style="width: 30%;">
+                        <div class="progress">
+                            <div class="progress-bar" role="progressbar" 
+                                 style="width: {{ result.percentage }}%"
+                                 aria-valuenow="{{ result.percentage }}" 
+                                 aria-valuemin="0" 
+                                 aria-valuemax="100">
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Reset Votes Section -->
+    <div class="reset-section">
+        <button type="button" class="btn btn-reset" data-bs-toggle="modal" data-bs-target="#resetModal">
+            <i class="fas fa-trash-alt me-2"></i>Reset All Votes
+        </button>
+    </div>
+
+    <!-- Reset Confirmation Modal -->
+    <div class="modal fade" id="resetModal" tabindex="-1" aria-labelledby="resetModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="resetModalLabel">
+                        <i class="fas fa-exclamation-triangle me-2"></i>Confirm Reset
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="fw-bold">Are you sure you want to reset all votes?</p>
+                    <p class="text-muted">This action cannot be undone. All voting data will be permanently deleted.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <form action="{{ url_for('reset_votes') }}" method="POST" style="display: inline;">
+                        <button type="submit" class="btn btn-confirm-reset">
+                            <i class="fas fa-trash-alt me-2"></i>Yes, Reset All Votes
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

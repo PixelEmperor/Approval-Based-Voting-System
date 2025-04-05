@@ -1,0 +1,162 @@
+{% extends "base.html" %}
+
+{% block extra_css %}
+<style>
+    .candidates-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 2rem;
+        margin: 2rem 0;
+    }
+
+    .candidate-card {
+        background: #ffffff;
+        border-radius: 12px;
+        padding: 1.5rem;
+        text-align: center;
+        transition: transform 0.3s ease;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        cursor: pointer;
+    }
+
+    .candidate-card.selected {
+        background: #e8f4fd;
+        border: 2px solid #3498db;
+        transform: translateY(-5px);
+    }
+
+    .candidate-symbol {
+        width: 120px;
+        height: 120px;
+        object-fit: contain;
+        margin-bottom: 1rem;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+    }
+
+    .candidate-card:hover .candidate-symbol {
+        transform: scale(1.05);
+    }
+
+    .candidate-card h3 {
+        color: #2c3e50;
+        font-size: 1.2rem;
+        margin-bottom: 1rem;
+    }
+
+    .form-check {
+        margin-top: 1rem;
+    }
+
+    .form-check-input {
+        width: 1.2em;
+        height: 1.2em;
+        margin-top: 0.2em;
+    }
+
+    .voter-id-section {
+        background: #f8f9fa;
+        padding: 2rem;
+        border-radius: 12px;
+        margin-bottom: 2rem;
+    }
+
+    .submit-section {
+        text-align: center;
+        margin-top: 2rem;
+    }
+
+    .btn-vote {
+        padding: 0.8rem 3rem;
+        font-size: 1.1rem;
+        background-color: #9b59b6;  /* Purple color */
+        border: none;
+        color: white;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+
+    .btn-vote:hover {
+        background-color: #8e44ad;  /* Darker purple on hover */
+        transform: translateY(-2px);
+        box-shadow: 0 6px 8px rgba(0,0,0,0.15);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2><i class="fas fa-vote-yea me-2"></i>Cast Your Vote</h2>
+    
+    <form method="POST">
+        <div class="voter-id-section">
+            <div class="row justify-content-center">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="voter_id" class="form-label">Enter Your Voter ID</label>
+                        <input type="text" 
+                               class="form-control form-control-lg" 
+                               id="voter_id" 
+                               name="voter_id" 
+                               required
+                               placeholder="Enter your voter ID">
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="candidates-grid">
+            {% for candidate in candidates %}
+            <div class="candidate-card" onclick="toggleSelection('candidate{{ loop.index }}')">
+                {% if candidate.symbol %}
+                    <img src="{{ url_for('static', filename='symbols/' + candidate.symbol.filename) }}" 
+                         alt="{{ candidate.symbol.name }}" 
+                         class="candidate-symbol">
+                {% endif %}
+                <h3>{{ candidate.name }}</h3>
+                <div class="form-check">
+                    <input class="form-check-input" 
+                           type="checkbox" 
+                           name="candidates[]" 
+                           value="{{ candidate._id }}" 
+                           id="candidate{{ loop.index }}"
+                           onclick="event.stopPropagation()">
+                    <label class="form-check-label" for="candidate{{ loop.index }}">
+                        Select this candidate
+                    </label>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="submit-section">
+            <button type="submit" class="btn btn-primary btn-vote">
+                <i class="fas fa-check-circle me-2"></i>Submit Vote
+            </button>
+        </div>
+    </form>
+</div>
+
+{% block extra_js %}
+<script>
+function toggleSelection(candidateId) {
+    const checkbox = document.getElementById(candidateId);
+    const card = checkbox.closest('.candidate-card');
+    
+    // Toggle checkbox
+    checkbox.checked = !checkbox.checked;
+    
+    // Toggle selected class for visual feedback
+    card.classList.toggle('selected', checkbox.checked);
+}
+
+// Add event listener to checkboxes to update card appearance
+document.querySelectorAll('.form-check-input').forEach(checkbox => {
+    checkbox.addEventListener('change', function(e) {
+        const card = this.closest('.candidate-card');
+        card.classList.toggle('selected', this.checked);
+        e.stopPropagation(); // Prevent triggering card click
+    });
+});
+</script>
+{% endblock %}
+{% endblock %}

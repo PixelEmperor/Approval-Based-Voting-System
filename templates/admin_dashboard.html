@@ -1,0 +1,170 @@
+{% extends "base.html" %}
+
+{% block extra_css %}
+<style>
+    .admin-dashboard {
+        padding: 2rem;
+    }
+
+    .dashboard-header {
+        text-align: center;
+        margin-bottom: 3rem;
+        padding: 2rem;
+        background: linear-gradient(135deg, #3498db, #2980b9);
+        color: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+
+    .dashboard-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2rem;
+        margin-top: 2rem;
+    }
+
+    .dashboard-card {
+        background: white;
+        padding: 2rem;
+        border-radius: 12px;
+        text-align: center;
+        transition: transform 0.3s ease;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+
+    .dashboard-card:hover {
+        transform: translateY(-5px);
+    }
+
+    .dashboard-card i {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+        color: #3498db;
+    }
+
+    .dashboard-card h3 {
+        color: #2c3e50;
+        margin-bottom: 1rem;
+    }
+
+    .dashboard-card p {
+        color: #7f8c8d;
+        margin-bottom: 1.5rem;
+    }
+
+    .btn-dashboard {
+        width: 100%;
+        padding: 1rem;
+        font-size: 1.1rem;
+        font-weight: 500;
+        border: none;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+    }
+
+    .btn-manage {
+        background-color: #2ecc71;
+        color: white;
+    }
+
+    .btn-manage:hover {
+        background-color: #27ae60;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+
+    .btn-results {
+        background-color: #e67e22;
+        color: white;
+    }
+
+    .btn-results:hover {
+        background-color: #d35400;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+
+    .btn-settings {
+        background-color: #9b59b6;
+        color: white;
+    }
+
+    .btn-settings:hover {
+        background-color: #8e44ad;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container admin-dashboard">
+    <div class="dashboard-header">
+        <h2><i class="fas fa-user-shield me-2"></i>Admin Dashboard</h2>
+        <p>Manage your voting system from here</p>
+    </div>
+
+    <div class="dashboard-grid">
+        <div class="dashboard-card">
+            <i class="fas fa-users"></i>
+            <h3>Manage Candidates</h3>
+            <p>Add, edit, or remove candidates and their symbols</p>
+            <a href="{{ url_for('manage_candidates') }}" class="btn btn-dashboard btn-manage">
+                <i class="fas fa-user-edit me-2"></i>Manage Candidates
+            </a>
+        </div>
+
+        <div class="dashboard-card">
+            <i class="fas fa-chart-bar"></i>
+            <h3>View Results</h3>
+            <p>Check the current voting results and statistics</p>
+            <a href="{{ url_for('view_results') }}" class="btn btn-dashboard btn-results">
+                <i class="fas fa-poll me-2"></i>View Results
+            </a>
+        </div>
+
+        <div class="dashboard-card">
+            <i class="fas fa-cog"></i>
+            <h3>System Settings</h3>
+            <p>Configure voting system settings and parameters</p>
+            <a href="#" class="btn btn-dashboard btn-settings">
+                <i class="fas fa-cogs me-2"></i>Settings
+            </a>
+        </div>
+
+        <div class="dashboard-card">
+            <i class="fas fa-trash-alt"></i>
+            <h3>Reset System</h3>
+            <p>Clear candidates or reset the entire system</p>
+            <button class="btn btn-dashboard btn-danger mb-2" data-bs-toggle="modal" data-bs-target="#resetCandidatesModal">
+                <i class="fas fa-user-times me-2"></i>Reset All Candidates
+            </button>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="resetCandidatesModal" tabindex="-1" aria-labelledby="resetCandidatesModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="resetCandidatesModalLabel">
+                    <i class="fas fa-exclamation-triangle me-2"></i>Confirm Reset Candidates
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p class="fw-bold">Are you sure you want to reset all candidates?</p>
+                <p class="text-muted">This action cannot be undone. All candidate data and their symbols will be permanently deleted.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <form action="{{ url_for('reset_candidates') }}" method="POST" style="display: inline;">
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash-alt me-2"></i>Yes, Reset All Candidates
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
